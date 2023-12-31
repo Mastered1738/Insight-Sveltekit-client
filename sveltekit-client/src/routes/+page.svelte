@@ -11,7 +11,7 @@
 </script>
 
 <div class="relative flex items-center justify-center h-screen">
-	<img class="absolute z-10 w-24 top-36" src="./src/multimedia/Logo.png" alt="Insight logo" />
+	<img class="absolute z-10 w-24 top-36" src="/multimedia/Logo.png" alt="Insight logo" />
 	<form
 		action=""
 		class="absolute grid grid-cols-1 pb-6 space-y-6 place-items-center bg-beige rounded-xl w-80"

@@ -12,11 +12,11 @@
 	</InsightMenu>
 	<div class="relative grid col-span-3 grid-rows-4 h-4/6">
 		<div class="absolute top-0 w-full h-64 border-2 border-black border-solid">
-			<img class="w-full h-full" src="./src/multimedia/cover-photo.png" alt="" />
+			<img class="w-full h-full" src="/multimedia/cover-photo.png" alt="" />
 		</div>
 		<img
 			class="absolute z-10 w-32 border-4 border-black border-solid rounded-full top-48 left-10"
-			src="./src/multimedia/anonymous-user.webp"
+			src="/multimedia/anonymous-user.webp"
 			alt=""
 		/>
 		<div class="absolute w-full top-64">
