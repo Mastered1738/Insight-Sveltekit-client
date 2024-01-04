@@ -5,12 +5,12 @@
 	import Post from '../../components/post.svelte';
 </script>
 
-<div class="grid h-screen grid-cols-6">
+<div class="grid h-full grid-cols-6 bg-beige">
 	<div class="h-full grid-cols-1 col-span-1">
 	</div>
 	<InsightMenu>
 	</InsightMenu>
-	<div class="relative grid col-span-3 grid-rows-4 h-4/6">
+	<div class="relative grid col-span-3 grid-rows-4 h-4/6 ">
 		<div class="absolute top-0 w-full h-64 border-2 border-black border-solid">
 			<img class="w-full h-full" src="/multimedia/cover-photo.png" alt="" />
 		</div>
@@ -36,7 +36,6 @@
 			<Post>
 			</Post>
 			<Post>
-				
 			</Post>
 		</div>
 	</div>
@@ -56,7 +55,4 @@
 </div>
 
 <style>
-	:global(html) {
-		background-color: #f8f7f4;
-	}
 </style>

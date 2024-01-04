@@ -14,7 +14,7 @@
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^2.1.1",
-		"@sveltejs/kit": "^1.27.4",
+		"@sveltejs/kit": "^1.30.3",
 		"@typescript-eslint/eslint-plugin": "^6.0.0",
 		"@typescript-eslint/parser": "^6.0.0",
 		"autoprefixer": "^10.4.16",
@@ -33,6 +33,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"svelte-routing": "^2.11.0"
+		"svelte-routing": "^2.11.0",
+		"tailwind-gradients": "^1.0.1",
+		"vercel": "^33.0.1"
 	}
 }

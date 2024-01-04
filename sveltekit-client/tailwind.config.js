@@ -1,3 +1,5 @@
+
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
@@ -11,9 +13,13 @@ export default {
         'strongpurple': '#8f71e7',
         'strongpink': '#e558fd',
         'darkblue': '#314867',
+      },
+      spacing: {
+        '1/6': '16.666667%'
       }
     },
   },
-  plugins: [],
+  plugins: [
+  ],
 }
 
