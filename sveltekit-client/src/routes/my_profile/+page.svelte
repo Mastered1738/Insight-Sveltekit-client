@@ -59,24 +59,18 @@
 		</div>
 		
 		<div class="absolute w-5/6 top-[32rem] place-self-center">
-			<Post>
-			</Post>
-			<Post>
-			</Post>
+			<Post></Post>
+			<Post></Post>
 		</div>
 	</div>
-	<div class="col-span-2">
-	</div>
+	<div class="col-span-2"></div>
 	<div class="fixed right-0 flex flex-col w-1/3 h-full bg-white">
 		<div class="flex items-center justify-center text-2xl text-white h-1/6 bg-strongpurple">
 			MOJ KALENDAR
 		</div>
 		<div class="w-full grid-rows-3 overflow-y-auto border-2 border-solid h-5/6 border-strongpurple">
-			<Calendar>
-			
-			</Calendar>
+			<Calendar></Calendar>
 		</div>
-		
 	</div>
 </div>
 
