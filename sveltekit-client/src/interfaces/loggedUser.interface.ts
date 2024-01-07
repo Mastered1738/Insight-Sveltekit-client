@@ -3,4 +3,6 @@ export default interface LoggedUserInterface {
     email: string;
     username: string;
     user_type: number;
+    profile_file: Uint8Array;
+    cover_file: Uint8Array;
 }

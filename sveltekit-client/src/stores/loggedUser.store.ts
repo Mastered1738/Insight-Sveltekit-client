@@ -6,4 +6,6 @@ export const loggedUserStore = writable<LoggedUserInterface>({
     email: '',
     username: '',
     user_type: 0,
+    profile_file: new Uint8Array,
+    cover_file: new Uint8Array,
 });

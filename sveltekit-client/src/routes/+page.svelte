@@ -10,13 +10,6 @@
 		password: ''
 	}
 
-	let foundUser: LoggedUserInterface = {
-		user_id: 0,
-		email: '',
-		username: '',
-		user_type: 0,
-	}
-
 	function LogIn(){
 		const response = fetch('http://localhost:3000/user/logIn', {
 			method: 'POST',
@@ -39,8 +32,15 @@
 				$loggedUserStore.email = data.email;
 				$loggedUserStore.username = data.username;
 				$loggedUserStore.user_type = data.user_type.user_type_id;
+				$loggedUserStore.profile_file = new Uint8Array(data.profile_file.data);
+				$loggedUserStore.cover_file = new Uint8Array(data.cover_file.data);
 				console.log('====================================');
-				console.log($loggedUserStore.user_id);
+				console.log('RESPONSE Profile File Uint8Array:', data.profile_file);
+				console.log('RESPONSE Cover File Uint8Array:', data.cover_file);
+				console.log('====================================');
+				console.log('====================================');
+				console.log('Profile File Uint8Array:', $loggedUserStore.profile_file);
+				console.log('Cover File Uint8Array:', $loggedUserStore.cover_file);
 				console.log('====================================');
 				//window.location.assign('./my_profile');
 				goto('/my_profile');

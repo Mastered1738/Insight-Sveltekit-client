@@ -1,28 +1,11 @@
-<script>
+<script lang="ts">
 	import { onMount } from 'svelte';
 	import '../../app.css';
 	import Calendar from '../../components/calendar.svelte';
 	import InsightMenu from '../../components/insightMenu.svelte';
 
-     // @ts-ignore
-     let privateMessages;
-     // @ts-ignore
-     /**
-	 * @type {any[]}
-	 */
-     let myGroups = [];
-
-    onMount( () => {
-        getMyGroups();
-    })
-     
-    // @ts-ignore
-    async function getPrivateMessages() {
-        fetch('localhost:3000/messages/')
-    }
-
+    /*
     async function getMyGroups() {
-    // @ts-ignore
     const response = fetch('http://localhost:3000/group/myGroups', {
             method: 'POST',
             headers: {
@@ -38,7 +21,7 @@
             console.log(myGroups);
             console.log('====================================');
         })
-    }
+    }*/
 
 
 </script>
@@ -72,14 +55,14 @@
                             Ime Prezime
                         </div>
                     </div>
-                    {#each myGroups as group}
+                    <!--{#each myGroups as group}
                     <div class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400">
                         <img src="/multimedia/anonymous-user.webp" alt="" class="w-10 border-2 border-gray-600 border-solid rounded-full">
                         <div>
                             {group.group_name}
                         </div>
                     </div>
-                    {/each}
+                    {/each}-->
                 </div>
             </div>
             <div class="grid h-full grid-cols-2 col-span-3 overflow-y-auto">
