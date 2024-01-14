@@ -25,7 +25,8 @@
         })
     }*/
 	// @ts-ignore
-	let privateMessages;
+	let privateChats: Array<any> = [];
+	let convertedPrivateChats: Array<any> = [];
 	// @ts-ignore
 	/**
 	 * @type {any[]}
@@ -35,6 +36,7 @@
 	onMount(() => {
 		checkUser();
 		getMyGroups();
+		getMyPrivateChats();
 	});
 
 	async function checkUser() {
@@ -43,8 +45,37 @@
 		}
 	}
 
+	const createBlobURL = (image_uint8array: Uint8Array) => {
+    const blob = new Blob([image_uint8array], {type: 'image/jpeg'});
+    return URL.createObjectURL(blob);
+  };
+
 	async function getMyPrivateChats() {
-		//const response = fetch()
+		const response = fetch('http://localhost:3000/user/get-private-messages', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ user_id: $loggedUserStore.user_id })
+		})
+		.then((data) => {
+			return data.json();
+		})
+		.then((data) => {
+			privateChats = data;
+			console.log('====================================');
+			console.log(privateChats);
+			console.log('====================================');
+			/*privateChats.forEach(user => {
+				user.profile_file = new Uint8Array(user.profile_file);
+			});
+			privateChats.forEach(user => {
+				user.profile_file = createBlobURL(user.profile_file);
+			})
+			console.log('CONVERTED DATA====================================');
+			console.log(privateChats);
+			console.log('CONVERTED DATA====================================');*/
+		})
 	}
 
 	async function getMyGroups() {
@@ -88,16 +119,19 @@
 				</div>
 				<div class="mt-2 overflow-y-auto">
 					<!--Put a foreach for every private or group chat-->
+					{#each privateChats as chat}
 					<div
-						class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
+					class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
 					>
-						<img
-							src="/multimedia/anonymous-user.webp"
-							alt=""
-							class="w-10 border-2 border-gray-600 border-solid rounded-full"
-						/>
-						<div>Ime Prezime</div>
+					<img
+						src="{chat.profile_file}"
+						alt=""
+						class="w-10 h-10 border-2 border-gray-600 border-solid rounded-full"
+					/>
+					<div>{chat.username}</div>
 					</div>
+					{/each}
+					
 					<!--{#each myGroups as group}
 						<div
 							class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
