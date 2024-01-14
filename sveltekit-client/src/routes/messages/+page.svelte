@@ -43,6 +43,10 @@
 		}
 	}
 
+	async function getMyPrivateChats() {
+		//const response = fetch()
+	}
+
 	async function getMyGroups() {
 		// @ts-ignore
 		const response = fetch('http://localhost:3000/group/myGroups', {
