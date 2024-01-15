@@ -26,7 +26,7 @@
     }*/
 	// @ts-ignore
 	let privateChats: Array<any> = [];
-	let convertedPrivateChats: Array<any> = [];
+	let loadedPrivateMessages: Array<any> = [];
 	// @ts-ignore
 	/**
 	 * @type {any[]}
@@ -96,6 +96,22 @@
 				console.log('====================================');
 			});
 	}
+
+	async function getChatMessagesByUser(user_id: number) {
+		const response = fetch('http://localhost:3000/private-messages/by-user-id', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				user_id: user_id,
+			})
+		})
+		.then((data) => {data.json()})
+		.then((data: any) => {
+			loadedPrivateMessages = data;
+		})
+	}
 </script>
 
 <div class="grid h-full grid-cols-6">
@@ -118,8 +134,11 @@
 				<div class="mt-2 overflow-y-auto">
 					<!--Put a foreach for every private or group chat-->
 					{#each privateChats as chat}
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<div
 					class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
+					on:click={() => { getChatMessagesByUser(chat.user_id)}}
 					>
 					<img
 						src="{chat.profile_file}"
@@ -148,6 +167,15 @@
 			</div>
 			<div class="grid h-full grid-cols-2 col-span-3 overflow-y-auto">
 				Razgovor
+			{#if loadedPrivateMessages.length > 0}
+				{#each loadedPrivateMessages as privateMessage}
+					{#if privateMessage.user_id == $loggedUserStore.user_id}
+					<div>
+						
+					</div>
+					{/if}
+				{/each}
+			{/if}
 				<!--Put a foreach for every message-->
 			</div>
 		</div>
