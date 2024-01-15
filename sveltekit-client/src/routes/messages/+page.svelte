@@ -62,20 +62,18 @@
 			return data.json();
 		})
 		.then((data) => {
-			privateChats = data;
+			privateChats = data.map((item: any) => {
+			const buffer = item.profile_file;
+			console.log('Buffer====================================');
+			console.log(buffer);
+			const uint8Array = new Uint8Array(buffer.data);
+			console.log('uint8array====================================');
+			console.log(uint8Array);
 			console.log('====================================');
-			console.log(privateChats);
-			console.log('====================================');
-			/*privateChats.forEach(user => {
-				user.profile_file = new Uint8Array(user.profile_file);
+			const blobURL = createBlobURL(uint8Array);
+			return { ...item, profile_file: blobURL };
 			});
-			privateChats.forEach(user => {
-				user.profile_file = createBlobURL(user.profile_file);
-			})
-			console.log('CONVERTED DATA====================================');
-			console.log(privateChats);
-			console.log('CONVERTED DATA====================================');*/
-		})
+		}) 
 	}
 
 	async function getMyGroups() {
