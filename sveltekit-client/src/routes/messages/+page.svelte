@@ -104,12 +104,23 @@
 				'Content-Type': 'application/json',
 			},
 			body: JSON.stringify({
-				user_id: user_id,
+				user_id: $loggedUserStore.user_id,
+				other_user_id: user_id,
 			})
 		})
-		.then((data) => {data.json()})
+		.then((data) => {
+			return data.json()
+		})
 		.then((data: any) => {
-			loadedPrivateMessages = data;
+				loadedPrivateMessages = data.map((item: any) => {
+				const buffer1 = item.sender_id.profile_file;
+				const buffer2 = item.receiver_id.profile_file;
+				const uint8Array1 = new Uint8Array(buffer1.data);
+				const uint8Array2 = new Uint8Array(buffer2.data);
+				const blobURL1 = createBlobURL(uint8Array1);
+				const blobURL2 = createBlobURL(uint8Array2);
+				return { ...item, sender_id: {...item.sender_id, profile_file: blobURL1}, receiver_id: {...item.receiver_id, profile_file: blobURL2} };
+			})
 		})
 	}
 </script>
@@ -134,10 +145,8 @@
 				<div class="mt-2 overflow-y-auto">
 					<!--Put a foreach for every private or group chat-->
 					{#each privateChats as chat}
-					<!-- svelte-ignore a11y-click-events-have-key-events -->
-					<!-- svelte-ignore a11y-no-static-element-interactions -->
-					<div
-					class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
+					<button type="button"
+					class="grid w-full grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
 					on:click={() => { getChatMessagesByUser(chat.user_id)}}
 					>
 					<img
@@ -146,37 +155,31 @@
 						class="w-10 h-10 border-2 border-gray-600 border-solid rounded-full"
 					/>
 					<div>{chat.username}</div>
-					</div>
+					</button>
 					{/each}
 					
-					<!--{#each myGroups as group}
-						<div
-							class="grid grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
-						>
-							<img
-								src="/multimedia/anonymous-user.webp"
-								alt=""
-								class="w-10 border-2 border-gray-600 border-solid rounded-full"
-							/>
-							<div>
-								{group.group_name}
+					<!--{#each myGroups as group}mr-
 							</div>
 						</div>
 					{/each}-->
 				</div>
 			</div>
-			<div class="grid h-full grid-cols-2 col-span-3 overflow-y-auto">
-				Razgovor
+			<div class="flex flex-col h-full col-span-3 overflow-y-auto">
 			{#if loadedPrivateMessages.length > 0}
 				{#each loadedPrivateMessages as privateMessage}
-					{#if privateMessage.user_id == $loggedUserStore.user_id}
-					<div>
-						
+					{#if privateMessage.sender_id.user_id == $loggedUserStore.user_id}
+					<div class="flex justify-end w-full mt-3">
+						<p class="max-w-md p-2 mx-2 bg-strongpink rounded-xl">{privateMessage.content}</p>
+						<img src="{privateMessage.sender_id.profile_file}" alt="" class="float-right w-10 h-10 rounded-full">
+					</div>
+					{:else}
+					<div class="flex w-full mt-3">
+						<img src="{privateMessage.sender_id.profile_file}" alt="" class="w-10 h-10 rounded-full">
+						<p class="max-w-md p-2 mx-2 bg-strongpurple rounded-xl">{privateMessage.content}</p>
 					</div>
 					{/if}
 				{/each}
 			{/if}
-				<!--Put a foreach for every message-->
 			</div>
 		</div>
 	</div>
