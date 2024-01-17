@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { afterUpdate, onMount } from 'svelte';
 	import '../../app.css';
 	import Calendar from '../../components/calendar.svelte';
 	import InsightMenu from '../../components/insightMenu.svelte';
@@ -32,6 +32,9 @@
 	 * @type {any[]}
 	 */
 	let myGroups = [];
+	let inputMessage: string = "Napiši poruku ovdje";
+	let other_user_id: number = 0;
+	let element: any;
 
 	onMount(() => {
 		checkUser();
@@ -112,7 +115,8 @@
 			return data.json()
 		})
 		.then((data: any) => {
-				loadedPrivateMessages = data.map((item: any) => {
+			other_user_id = user_id;
+			loadedPrivateMessages = data.map((item: any) => {
 				const buffer1 = item.sender_id.profile_file;
 				const buffer2 = item.receiver_id.profile_file;
 				const uint8Array1 = new Uint8Array(buffer1.data);
@@ -120,8 +124,64 @@
 				const blobURL1 = createBlobURL(uint8Array1);
 				const blobURL2 = createBlobURL(uint8Array2);
 				return { ...item, sender_id: {...item.sender_id, profile_file: blobURL1}, receiver_id: {...item.receiver_id, profile_file: blobURL2} };
-			})
+			});
+			loadedPrivateMessages.reverse();
+			scrollToBottom(element);
 		})
+	}
+
+	async function removePoruka() {
+		if (inputMessage == "Napiši poruku ovdje") {
+			inputMessage = "";
+		}
+	}
+
+	async function putPoruka() {
+		if (inputMessage == "") {
+			inputMessage = "Napiši poruku ovdje";
+		}
+	}
+
+	afterUpdate(() => {
+		if (loadedPrivateMessages) {
+			scrollToBottom(element);
+		}
+	});
+
+	const scrollToBottom = async (node: any) => {
+    	node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+  	}; 
+
+	async function sendMessage(){
+		const response = await fetch('http://localhost:3000/private-messages/send-message',{
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				sender_id: $loggedUserStore.user_id,
+				receiver_id: other_user_id,
+				content: inputMessage,
+			}),
+		})
+		.then((data) => {
+			return data.json()
+		})
+		.then((data) => {
+            inputMessage = "Napiši poruku ovdje";
+            const uint8Array1 = new Uint8Array(data.sender_id.profile_file.data);
+            const uint8Array2 = new Uint8Array(data.receiver_id.profile_file.data);
+            const blobURL1 = createBlobURL(uint8Array1);
+            const blobURL2 = createBlobURL(uint8Array2);
+
+            data.sender_id = { ...data.sender_id, profile_file: blobURL1 };
+            data.receiver_id = { ...data.receiver_id, profile_file: blobURL2 };
+
+            if (loadedPrivateMessages.length === 30) {
+                loadedPrivateMessages.shift();
+            }
+            loadedPrivateMessages.push(data);
+			loadedPrivateMessages = loadedPrivateMessages;
+			scrollToBottom(element);
+        });
 	}
 </script>
 
@@ -164,12 +224,12 @@
 					{/each}-->
 				</div>
 			</div>
-			<div class="flex flex-col h-full col-span-3 overflow-y-auto">
+			<div class="flex bind:this={element} flex-col col-span-3 pl-3 pr-3 overflow-y-auto h-3/4">
 			{#if loadedPrivateMessages.length > 0}
 				{#each loadedPrivateMessages as privateMessage}
 					{#if privateMessage.sender_id.user_id == $loggedUserStore.user_id}
 					<div class="flex justify-end w-full mt-3">
-						<p class="max-w-md p-2 mx-2 bg-strongpink rounded-xl">{privateMessage.content}</p>
+						<p class="max-w-md p-2 mx-2 overscroll-x-none bg-strongpink rounded-xl">{privateMessage.content}</p>
 						<img src="{privateMessage.sender_id.profile_file}" alt="" class="float-right w-10 h-10 rounded-full">
 					</div>
 					{:else}
@@ -180,6 +240,12 @@
 					{/if}
 				{/each}
 			{/if}
+			</div>
+			<div class="fixed bottom-0 flex flex-row justify-start h-12 border-gray-400 border-solid left-29.17% right-1/3 border-y-2 bg-beige">
+				<textarea bind:value={inputMessage} on:focus={removePoruka} on:focusout={putPoruka} rows="10" cols="70" class="flex flex-col w-full p-2 overflow-auto text-lg outline-none resize-none bg-beige"></textarea>
+				<button class="" type="button" on:click={sendMessage}>
+					<img src="/multimedia/send.svg" alt="" class="w-8 mx-3">
+				</button>
 			</div>
 		</div>
 	</div>
