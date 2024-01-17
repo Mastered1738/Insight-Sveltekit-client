@@ -7,6 +7,16 @@ const config = {
 	kit: {
 		adapter: adapter({})
 	},
+	vite: {
+		server: {
+			proxy: {
+				'/socket.io': {
+					target: 'http://localhost:3000',
+					ws: true,
+				}
+			}
+		}
+	},
 	preprocess: vitePreprocess(),
 	plugins: [preprocess({ typescript: true })]
 };

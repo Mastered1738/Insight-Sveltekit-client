@@ -33,23 +33,44 @@
 	 */
 	let myGroups = [];
 	let inputMessage: string = "Napiši poruku ovdje";
-	let other_user_id: number = 0;
 	let element: any;
+	let other_user_id: number = 0;
+	let searching_username: string = "";
+	let chatFormVisibility: boolean = false;
 
-	const socket = io();
+	let user_list: Array<any> = [];
 
-	socket.on("private-message", (data) => {
-		console.log(data);
+	const socket = io('http://localhost:3000');
+
+	socket.on("private-message", (data: any) => {
+		inputMessage = "Napiši poruku ovdje";
+		const uint8Array1 = new Uint8Array(data.response.sender_id.profile_file.data);
+		const uint8Array2 = new Uint8Array(data.response.receiver_id.profile_file.data);
+		const blobURL1 = createBlobURL(uint8Array1);
+		const blobURL2 = createBlobURL(uint8Array2);
+
+		data.response.sender_id = { ...data.response.sender_id, profile_file: blobURL1 };
+		data.response.receiver_id = { ...data.response.receiver_id, profile_file: blobURL2 };
+
+		if (loadedPrivateMessages.length === 30) {
+			loadedPrivateMessages.shift();
+		}
+		loadedPrivateMessages.push(data.response);
+		loadedPrivateMessages = loadedPrivateMessages;
+		scrollToBottom(element);
+		console.log('====================================');
+		console.log(loadedPrivateMessages);
+		console.log('====================================');
 	});
 
 	async function joinSocketRoom(user_id: number, other_user_id: number) {
-    const roomData = {
-        user_id1: user_id,
-        user_id2: other_user_id
-    };
+		const roomData = {
+			user_id1: user_id,
+			user_id2: other_user_id
+		};
 
-    socket.emit("enter-room", roomData);
-}
+		socket.emit("enter-room", roomData);
+	}
 
 	onMount(() => {
 		checkUser();
@@ -67,6 +88,16 @@
     const blob = new Blob([image_uint8array], {type: 'image/jpeg'});
     return URL.createObjectURL(blob);
   };
+
+  	async function getUsersByUsername(){
+		const response = await fetch('http://localhost:3000/user/getUsersbyUsername',{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ username: $loggedUserStore.user_id })
+		});
+	}
 
 	async function getMyPrivateChats() {
 		const response = fetch('http://localhost:3000/user/get-private-messages', {
@@ -130,7 +161,6 @@
 			return data.json()
 		})
 		.then((data: any) => {
-			other_user_id = user_id;
 			loadedPrivateMessages = data.map((item: any) => {
 				const buffer1 = item.sender_id.profile_file;
 				const buffer2 = item.receiver_id.profile_file;
@@ -143,6 +173,8 @@
 			loadedPrivateMessages.reverse();
 			scrollToBottom(element);
 			joinSocketRoom($loggedUserStore.user_id, user_id);
+			console.log(joinSocketRoom($loggedUserStore.user_id, user_id));
+			other_user_id = user_id;
 		})
 	}
 
@@ -201,7 +233,15 @@
 	}*/
 
 	async function sendMessage() {
-		
+		socket.emit('private-message', {
+			sender_id: $loggedUserStore.user_id,
+			receiver_id: other_user_id,
+			content: inputMessage,
+		})
+	}
+
+	async function handleChatForm() {
+		chatFormVisibility = !chatFormVisibility;
 	}
 </script>
 
@@ -216,7 +256,16 @@
 		</div>
 		<div class="fixed grid w-1/2 h-full grid-cols-4 top-1/6">
 			<div class="h-full grid-cols-1 col-span-1 border-gray-400 border-solid border-x-2">
-				<button class="relative flex flex-col items-end w-full p-1 text-sm">+Novi razgovor</button>
+				<button class="relative flex flex-col items-end w-full p-1 text-sm" on:click={handleChatForm}>+Novi razgovor</button>
+				{#if chatFormVisibility == true}
+				<form action="" class="fixed ">
+					<input type="text" name="" id="" class="outline-none resize-none">
+					<!--Put foreach to render all found users-->
+					<select name="" id="" multiple>
+
+					</select>
+				</form>
+				{/if}
 				<div class="grid grid-cols-2 place-items-center">
 					<!--Put if statement to render either private or group chat-->
 					<div class="">Privatno</div>
@@ -244,7 +293,7 @@
 					{/each}-->
 				</div>
 			</div>
-			<div class="flex bind:this={element} flex-col col-span-3 pl-3 pr-3 overflow-y-auto h-3/4">
+			<div bind:this={element} class="flex flex-col col-span-3 pl-3 pr-3 overflow-y-auto h-3/4">
 			{#if loadedPrivateMessages.length > 0}
 				{#each loadedPrivateMessages as privateMessage}
 					{#if privateMessage.sender_id.user_id == $loggedUserStore.user_id}
