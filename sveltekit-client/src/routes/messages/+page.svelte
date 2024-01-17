@@ -5,7 +5,7 @@
 	import InsightMenu from '../../components/insightMenu.svelte';
 	import { loggedUserStore } from '../../stores/loggedUser.store';
 	import { goto } from '$app/navigation';
-
+	import { io } from "socket.io-client";
     /*
     async function getMyGroups() {
     const response = fetch('http://localhost:3000/group/myGroups', {
@@ -35,6 +35,21 @@
 	let inputMessage: string = "Napiši poruku ovdje";
 	let other_user_id: number = 0;
 	let element: any;
+
+	const socket = io();
+
+	socket.on("private-message", (data) => {
+		console.log(data);
+	});
+
+	async function joinSocketRoom(user_id: number, other_user_id: number) {
+    const roomData = {
+        user_id1: user_id,
+        user_id2: other_user_id
+    };
+
+    socket.emit("enter-room", roomData);
+}
 
 	onMount(() => {
 		checkUser();
@@ -127,6 +142,7 @@
 			});
 			loadedPrivateMessages.reverse();
 			scrollToBottom(element);
+			joinSocketRoom($loggedUserStore.user_id, user_id);
 		})
 	}
 
@@ -152,7 +168,7 @@
     	node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
   	}; 
 
-	async function sendMessage(){
+	/*async function sendMessage(){
 		const response = await fetch('http://localhost:3000/private-messages/send-message',{
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -182,6 +198,10 @@
 			loadedPrivateMessages = loadedPrivateMessages;
 			scrollToBottom(element);
         });
+	}*/
+
+	async function sendMessage() {
+		
 	}
 </script>
 
