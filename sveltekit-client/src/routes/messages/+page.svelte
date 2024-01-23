@@ -21,7 +21,7 @@
 	let privatno = true;
 	let loadedGroup: number = 0;
 
-	const socket = io('http://localhost:3000');
+	const socket = io('https://seal-app-bx8q5.ondigitalocean.app');
 
 	socket.on("private-message", (data: any) => {
 		inputMessage = "Napiši poruku ovdje";
