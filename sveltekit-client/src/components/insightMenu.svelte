@@ -1,3 +1,6 @@
+<script lang="ts">
+</script>
+
 <div class="fixed w-1/6 h-full grid-cols-1 bg-white">
     <div class="top-0 flex w-full h-36 place-items-center">
         <img class="float-left w-16 ml-10 mr-3" src="/multimedia/Logo.png" alt="" />
@@ -18,6 +21,10 @@
     <div class="grid grid-cols-2 justify-items-center mb-2.5 mt-2.5">
         <img class="h-10" src="/multimedia/chat-icon.svg" alt="" />
         <a class="w-full h-full mt-2 mr-8 text-l" href="../messages">Poruke</a>
+    </div>
+    <div class="grid grid-cols-2 justify-items-center mb-2.5 mt-2.5">
+        <img class="h-10" src="/multimedia/log-out.svg" alt="" />
+        <a class="w-full h-full mt-2 mr-8 text-l" href="/">Log out</a>
     </div>
     <div class="fixed grid w-1/6 grid-cols-2 bottom-10 justify-items-center mt-72 ">
         <img
