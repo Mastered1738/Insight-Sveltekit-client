@@ -20,7 +20,7 @@
 	const localCoverFileImagePatch = '/multimedia/cover-photo.png';
 
 	async function LogIn(){
-		const response = fetch('http://localhost:3000/user/logIn', {
+		const response = fetch('https://seal-app-bx8q5.ondigitalocean.app/user/logIn', {
 			method: 'POST',
 			headers: {
             'Content-Type': 'application/json',
@@ -67,7 +67,7 @@
 	}
 
 	async function registerUser() {
-		const response = await fetch('http://localhost:3000/user/create-user', {
+		const response = await fetch('https://seal-app-bx8q5.ondigitalocean.app/user/create-user', {
 			method: 'POST',
 			headers: {
             'Content-Type': 'application/json',

@@ -89,7 +89,7 @@
   };
 
   	async function getUsersByUsername(){
-		const response = await fetch('http://localhost:3000/user/getUsersbyUsername',{
+		const response = await fetch('https://seal-app-bx8q5.ondigitalocean.app/user/getUsersbyUsername',{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -108,7 +108,7 @@
 	}
 
 	async function getMyPrivateChats() {
-		const response = fetch('http://localhost:3000/user/get-private-messages', {
+		const response = fetch('https://seal-app-bx8q5.ondigitalocean.app/user/get-private-messages', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -135,7 +135,7 @@
 
 	async function getMyGroups() {
 		// @ts-ignore
-		const response = fetch('http://localhost:3000/group/myGroups', {
+		const response = fetch('https://seal-app-bx8q5.ondigitalocean.app/group/myGroups', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -155,7 +155,7 @@
 	}
 
 	async function getChatMessagesByUser(user_id: number) {
-		const response = fetch('http://localhost:3000/private-messages/by-user-id', {
+		const response = fetch('https://seal-app-bx8q5.ondigitalocean.app/private-messages/by-user-id', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -246,7 +246,7 @@
 	}
 
 	async function loadGroupMessages(group_id: number){
-		const response = await fetch('http://localhost:3000/group-message/get-messages',{
+		const response = await fetch('https://seal-app-bx8q5.ondigitalocean.app/group-message/get-messages',{
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

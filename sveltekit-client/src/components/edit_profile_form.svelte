@@ -40,7 +40,7 @@
       console.log('Profile File (before fetch):');
       console.log(profile_file);
   
-      await fetch('http://localhost:3000/user/updateUserProfile', {
+      await fetch('https://seal-app-bx8q5.ondigitalocean.app/user/updateUserProfile', {
         method: 'POST',
         body: formData,
       })
