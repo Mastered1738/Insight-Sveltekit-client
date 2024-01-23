@@ -1,6 +1,7 @@
 <script lang="ts">
     import { loggedUserStore } from "../stores/loggedUser.store";
-  
+	import { showUpdateProfileForm } from "../stores/showUpdateProfileForm.store";
+
     let cover_file: File | null = null;
     let profile_file: File | null = null;
   
@@ -54,21 +55,29 @@
           console.log($loggedUserStore.profile_file);
           console.log('====================================');
           console.log($loggedUserStore.cover_file);
+          $showUpdateProfileForm = false;
         });
+    }
+
+    async function exit() {
+      $showUpdateProfileForm = false;
     }
   </script>
   
   <div class="flex items-center justify-center min-h-screen bg-gray-200">
     <form on:submit|preventDefault={updateUserProfile} class="fixed flex items-center justify-center w-1/2 h-1/2 bg-strongpink rounded-xl" enctype="multipart/form-data" method="post">
-      <div>
-        <label for="">Ažuriraj pozadinsku sliku</label>
-        <input type="file" name="cover_file" on:change={(e) => coverFileInput(e)}>
+      <div class="flex flex-col">
+        <div class="mb-4">
+          <label for="">Ažuriraj pozadinsku sliku</label>
+          <input type="file" name="cover_file" on:change={(e) => coverFileInput(e)}>
+        </div>
+        <div class="mb-4">
+          <label for="">Ažuriraj profilnu sliku</label>
+          <input type="file" name="profile_file" on:change={(e) => profileFileInput(e)}>
+        </div>
+        <button type="submit" class="w-16 mb-4 bg-white h-7 rounded-xl">Spremi</button>
+        <button type="button" class="w-16 bg-white h-7 rounded-xl" on:click={exit}>Izlaz</button>
       </div>
-      <div>
-        <label for="">Ažuriraj profilnu sliku</label>
-        <input type="file" name="profile_file" on:change={(e) => profileFileInput(e)}>
-      </div>
-      <button type="submit">Spremi</button>
     </form>
   </div>
   

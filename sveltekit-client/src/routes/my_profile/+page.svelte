@@ -6,13 +6,13 @@
 	import EditProfileForm from '../../components/edit_profile_form.svelte';
 	import { loggedUserStore } from '../../stores/loggedUser.store';
 	import { onMount } from 'svelte';
+	import { showUpdateProfileForm } from '../../stores/showUpdateProfileForm.store';
 
-	let showUpdateProfileForm: Boolean = false;
 	let profile_file_URL: string = ''; 
 	let cover_file_URL: string = ''; 
 
 	function handleShowForm(){
-		showUpdateProfileForm = !showUpdateProfileForm;
+		$showUpdateProfileForm = true;
 	}
 
 	const createBlobURL = (image_uint8array: Uint8Array) => {
@@ -27,7 +27,7 @@
 
 </script>
 
-{#if showUpdateProfileForm}
+{#if $showUpdateProfileForm}
 	<EditProfileForm></EditProfileForm>
 {/if}
 <div class="grid h-full grid-cols-6 bg-beige">
