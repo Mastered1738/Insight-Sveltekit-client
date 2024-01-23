@@ -236,7 +236,10 @@
 	}
 
 	async function createNewChat(chosen_user_id: number) {
+		const user = user_list.find(user => user.user_id === chosen_user_id);
 
+		privateChats.push(user);
+		privateChats = privateChats;
 	}
 
 	async function joinGroupSocketRoom(group_name: string) {
