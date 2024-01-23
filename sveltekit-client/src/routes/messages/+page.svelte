@@ -6,39 +6,20 @@
 	import { loggedUserStore } from '../../stores/loggedUser.store';
 	import { goto } from '$app/navigation';
 	import { io } from "socket.io-client";
-    /*
-    async function getMyGroups() {
-    const response = fetch('http://localhost:3000/group/myGroups', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ user_id: 1 }),
-        }).then((data) => {
-            return data.json();
-        }).then((data) => {
-            myGroups = data;
-            console.log('====================================');
-            // @ts-ignore
-            console.log(myGroups);
-            console.log('====================================');
-        })
-    }*/
-	// @ts-ignore
+
+	
 	let privateChats: Array<any> = [];
 	let loadedPrivateMessages: Array<any> = [];
-	// @ts-ignore
-	/**
-	 * @type {any[]}
-	 */
-	let myGroups = [];
+	let loadedGroupMessages: Array<any> = [];
+	let myGroups: Array<any> = [];
 	let inputMessage: string = "Napiši poruku ovdje";
 	let element: any;
 	let other_user_id: number = 0;
 	let searching_username: string = "";
 	let chatFormVisibility: boolean = false;
-
 	let user_list: Array<any> = [];
+	let privatno = true;
+	let loadedGroup: number = 0;
 
 	const socket = io('http://localhost:3000');
 
@@ -62,6 +43,24 @@
 		console.log(loadedPrivateMessages);
 		console.log('====================================');
 	});
+
+	socket.on('group-message', (data: any) => {
+		inputMessage = "Napiši poruku ovdje";
+		const uint8Array1 = new Uint8Array(data.response.sender_id.profile_file.data);
+		const blobURL1 = createBlobURL(uint8Array1);
+
+		data.response.sender_id = { ...data.response.sender_id, profile_file: blobURL1 };
+
+		if (loadedGroupMessages.length === 30) {
+			loadedGroupMessages.shift();
+		}
+		loadedGroupMessages.push(data.response);
+		loadedGroupMessages = loadedGroupMessages;
+		scrollToBottom(element);
+		console.log('====================================');
+		console.log(loadedGroupMessages);
+		console.log('====================================');
+	})
 
 	async function joinSocketRoom(user_id: number, other_user_id: number) {
 		const roomData = {
@@ -95,7 +94,16 @@
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ username: $loggedUserStore.user_id })
+			body: JSON.stringify({ username: searching_username })
+		})
+		.then((data) => {return data.json()})
+		.then((data) => {
+			user_list = data.map((item: any)  => {
+				const buffer = item.profile_file;
+				const uint8Array = new Uint8Array(buffer.data);
+				const blobURL = createBlobURL(uint8Array);
+				return { ...item, profile_file: blobURL };
+			})
 		});
 	}
 
@@ -200,38 +208,6 @@
     	node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
   	}; 
 
-	/*async function sendMessage(){
-		const response = await fetch('http://localhost:3000/private-messages/send-message',{
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify({
-				sender_id: $loggedUserStore.user_id,
-				receiver_id: other_user_id,
-				content: inputMessage,
-			}),
-		})
-		.then((data) => {
-			return data.json()
-		})
-		.then((data) => {
-            inputMessage = "Napiši poruku ovdje";
-            const uint8Array1 = new Uint8Array(data.sender_id.profile_file.data);
-            const uint8Array2 = new Uint8Array(data.receiver_id.profile_file.data);
-            const blobURL1 = createBlobURL(uint8Array1);
-            const blobURL2 = createBlobURL(uint8Array2);
-
-            data.sender_id = { ...data.sender_id, profile_file: blobURL1 };
-            data.receiver_id = { ...data.receiver_id, profile_file: blobURL2 };
-
-            if (loadedPrivateMessages.length === 30) {
-                loadedPrivateMessages.shift();
-            }
-            loadedPrivateMessages.push(data);
-			loadedPrivateMessages = loadedPrivateMessages;
-			scrollToBottom(element);
-        });
-	}*/
-
 	async function sendMessage() {
 		socket.emit('private-message', {
 			sender_id: $loggedUserStore.user_id,
@@ -240,8 +216,57 @@
 		})
 	}
 
+	async function sendGroupMessage() {
+		socket.emit('group-message', {
+			group_id: loadedGroup,
+			sender_id: $loggedUserStore.user_id,
+			content: inputMessage,
+		});
+	}
+
 	async function handleChatForm() {
 		chatFormVisibility = !chatFormVisibility;
+	}
+
+	async function choosePrivateChats() {
+		privatno = true;
+	}
+	async function chooseGroupChats() {
+		privatno = false;
+	}
+
+	async function createNewChat(chosen_user_id: number) {
+
+	}
+
+	async function joinGroupSocketRoom(group_name: string) {
+		socket.emit('enter-group-room', {
+			group_name: group_name,
+		});
+	}
+
+	async function loadGroupMessages(group_id: number){
+		const response = await fetch('http://localhost:3000/group-message/get-messages',{
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				group_id: group_id,
+			})
+		})
+		.then((data) => {return data.json()})
+		.then((data) => {
+			loadedPrivateMessages = data.map((item: any) => {
+				const buffer1 = item.sender_id.profile_file;
+				const uint8Array1 = new Uint8Array(buffer1.data);
+				const blobURL1 = createBlobURL(uint8Array1);
+				return { ...item, sender_id: {...item.sender_id, profile_file: blobURL1}};
+			});
+			loadedPrivateMessages.reverse();
+			loadedGroup = group_id;
+			scrollToBottom(element);
+		})
 	}
 </script>
 
@@ -259,63 +284,104 @@
 				<button class="relative flex flex-col items-end w-full p-1 text-sm" on:click={handleChatForm}>+Novi razgovor</button>
 				{#if chatFormVisibility == true}
 				<form action="" class="fixed ">
-					<input type="text" name="" id="" class="outline-none resize-none">
+					<input type="text" on:input={getUsersByUsername} class="pl-2 text-lg border-2 border-solid outline-none resize-none border-strongpurple" bind:value={searching_username}>
 					<!--Put foreach to render all found users-->
-					<select name="" id="" multiple>
-
-					</select>
+					{#if chatFormVisibility == true}
+					<div class="w-full border-2 border-solid border-strongpurple">
+						{#each user_list as user}
+						<button type="button" class="flex w-full pb-1 pl-2 bg-white justify-items-center hover:bg-strongpurple" on:click={() => {createNewChat(user.user_id)}}>
+							<img src="{user.profile_file}" alt="" class="float-left w-10 rounded-full">
+							<div class="flex justify-center">{user.username}</div>
+						</button>
+						{/each}
+					</div>
+					{/if}
 				</form>
 				{/if}
-				<div class="grid grid-cols-2 place-items-center">
+				<div class="grid grid-cols-2 border-b-2 border-b-solid place-items-center border-b-gray-400">
 					<!--Put if statement to render either private or group chat-->
-					<div class="">Privatno</div>
-					<div class="">Grupe</div>
+					<button type="button" class="" on:click={choosePrivateChats}>Privatno</button>
+					<button type="button" class="" on:click={chooseGroupChats}>Grupe</button>
 				</div>
 				<div class="mt-2 overflow-y-auto">
 					<!--Put a foreach for every private or group chat-->
-					{#each privateChats as chat}
-					<button type="button"
-					class="grid w-full grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
-					on:click={() => { getChatMessagesByUser(chat.user_id)}}
-					>
-					<img
-						src="{chat.profile_file}"
-						alt=""
-						class="w-10 h-10 border-2 border-gray-600 border-solid rounded-full"
-					/>
-					<div>{chat.username}</div>
-					</button>
-					{/each}
-					
-					<!--{#each myGroups as group}mr-
+					{#if privatno == true}
+						{#each privateChats as chat}
+							<button type="button"
+							class="grid w-full grid-cols-2 border-b-2 border-gray-400 border-solid place-items-center hover:bg-gray-400"
+							on:click={() => { getChatMessagesByUser(chat.user_id)}}
+							>
+							<img
+								src="{chat.profile_file}"
+								alt=""
+								class="w-10 h-10 border-2 border-gray-600 border-solid rounded-full"
+							/>
+							<div>{chat.username}</div>
+							</button>
+						{/each}
+					{:else if privatno == false}
+						{#each myGroups as group }
+						<button type="button" on:click={() => {loadGroupMessages(group.group_id), joinGroupSocketRoom(group.group_name)}}>
+							<div>
+								{group.group_name}
 							</div>
-						</div>
-					{/each}-->
+						</button>
+						{/each}
+					{/if}
 				</div>
 			</div>
 			<div bind:this={element} class="flex flex-col col-span-3 pl-3 pr-3 overflow-y-auto h-3/4">
-			{#if loadedPrivateMessages.length > 0}
-				{#each loadedPrivateMessages as privateMessage}
-					{#if privateMessage.sender_id.user_id == $loggedUserStore.user_id}
-					<div class="flex justify-end w-full mt-3">
-						<p class="max-w-md p-2 mx-2 overscroll-x-none bg-strongpink rounded-xl">{privateMessage.content}</p>
-						<img src="{privateMessage.sender_id.profile_file}" alt="" class="float-right w-10 h-10 rounded-full">
-					</div>
-					{:else}
-					<div class="flex w-full mt-3">
-						<img src="{privateMessage.sender_id.profile_file}" alt="" class="w-10 h-10 rounded-full">
-						<p class="max-w-md p-2 mx-2 bg-strongpurple rounded-xl">{privateMessage.content}</p>
-					</div>
-					{/if}
-				{/each}
+			{#if privatno == true}
+				{#if loadedPrivateMessages.length > 0}
+					{#each loadedPrivateMessages as privateMessage}
+						{#if privateMessage.sender_id.user_id == $loggedUserStore.user_id}
+						<div class="flex justify-end w-full mt-3">
+							<p class="max-w-md p-2 mx-2 overscroll-x-none bg-strongpink rounded-xl">{privateMessage.content}</p>
+							<img src="{privateMessage.sender_id.profile_file}" alt="" class="float-right w-10 h-10 rounded-full">
+						</div>
+						{:else}
+						<div class="flex w-full mt-3">
+							<img src="{privateMessage.sender_id.profile_file}" alt="" class="w-10 h-10 rounded-full">
+							<p class="max-w-md p-2 mx-2 bg-strongpurple rounded-xl">{privateMessage.content}</p>
+						</div>
+						{/if}
+					{/each}
+				{/if}
+			{/if}
+			{#if privatno == false}
+				{#if loadedGroupMessages.length > 0}
+					{#each loadedGroupMessages as groupMessage}
+						{#if groupMessage.sender_id.user_id == $loggedUserStore.user_id}
+						<div class="flex justify-end w-full mt-3">
+							<p class="max-w-md p-2 mx-2 overscroll-x-none bg-strongpink rounded-xl">{groupMessage.content}</p>
+							<img src="{groupMessage.sender_id.profile_file}" alt="" class="float-right w-10 h-10 rounded-full">
+						</div>
+						{:else}
+						<div class="flex w-full mt-3">
+							<img src="{groupMessage.sender_id.profile_file}" alt="" class="w-10 h-10 rounded-full">
+							<p class="max-w-md p-2 mx-2 bg-strongpurple rounded-xl">{groupMessage.content}</p>
+						</div>
+						{/if}
+					{/each}
+				{/if}
 			{/if}
 			</div>
+			{#if privatno == true}
 			<div class="fixed bottom-0 flex flex-row justify-start h-12 border-gray-400 border-solid left-29.17% right-1/3 border-y-2 bg-beige">
 				<textarea bind:value={inputMessage} on:focus={removePoruka} on:focusout={putPoruka} rows="10" cols="70" class="flex flex-col w-full p-2 overflow-auto text-lg outline-none resize-none bg-beige"></textarea>
 				<button class="" type="button" on:click={sendMessage}>
 					<img src="/multimedia/send.svg" alt="" class="w-8 mx-3">
 				</button>
 			</div>
+			{:else if privatno == false}
+			<div class="fixed bottom-0 flex flex-row justify-start h-12 border-gray-400 border-solid left-29.17% right-1/3 border-y-2 bg-beige">
+				<textarea bind:value={inputMessage} on:focus={removePoruka} on:focusout={putPoruka} rows="10" cols="70" class="flex flex-col w-full p-2 overflow-auto text-lg outline-none resize-none bg-beige"></textarea>
+				<button class="" type="button" on:click={sendGroupMessage}>
+					<img src="/multimedia/send.svg" alt="" class="w-8 mx-3">
+				</button>
+			</div>
+			{/if}
+			
 		</div>
 	</div>
 	<div class="col-span-2"></div>

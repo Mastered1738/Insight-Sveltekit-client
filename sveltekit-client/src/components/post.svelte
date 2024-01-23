@@ -7,7 +7,7 @@
             </div>
     </div>
     <div class="relative bg-white border-gray-500 border-solid border-x-2">
-        <p class="relative z-10 pr-20 mt-10 mb-32 left-10">LJUDI POMOZITE OVAJ EPIDI ME UBIJA!!!! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+        <p class="relative z-10 pr-20 mt-10 mb-32 left-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
          enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint o
          ccaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
         </p>
